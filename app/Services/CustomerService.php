@@ -5,7 +5,7 @@ use App\Models\Customer;
 
 class CustomerService
 {
-    public function storeCostumer($data)
+    public function storeCustomer($data)
     {
         return Customer::create($data);
     }
