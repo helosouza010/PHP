@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Customer; // Usando Customer no lugar de Client
 use App\Models\Product;
 use App\Models\OrderItem;
+use App\Services\OrderService;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use Illuminate\Http\Request;
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function index()
     {
         // Carrega os pedidos com os clientes e itens
