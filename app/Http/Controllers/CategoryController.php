@@ -15,12 +15,10 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
-
-
     // Página principal (listar todas)
     public function index()
     {
-        $categories = Category::get();
+        $categories = Category::all();
         return view('categories.index', compact('categories'));
     }
 
@@ -33,34 +31,47 @@ class CategoryController extends Controller
     // Criar nova categoria
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
         ], [
             'name.required' => 'O campo Nome é obrigatório.',
         ]);
 
-        Category::create($request->all());
-        return redirect()->route('categories.index');
+        // Uso do service
+        $this->categoryService->storeCategory($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Categoria criada com sucesso.');
     }
 
     // Formulário de edição
     public function edit($id)
     {
-        $category = Category::find($id);
+        $category = Category::findOrFail($id);
         return view('categories.create_update', compact('category'));
     }
 
     // Atualizar categoria existente
     public function update(Request $request, string $id)
     {
-        Category::find($id)->update($request->all());
-        return redirect()->route('categories.index');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $category = Category::findOrFail($id);
+        $category->update($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Categoria atualizada com sucesso.');
     }
 
     // Excluir categoria
     public function destroy(string $id)
     {
-        Category::find($id)->delete();
-        return redirect()->route('categories.index');
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Categoria excluída com sucesso.');
     }
 }

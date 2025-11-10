@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Services;
-use App\Models\Costumer;
+use App\Models\Customer;
 
-class CostumerService
+class CustomerService
 {
     public function storeCostumer($data)
     {
-        return Costumer::create($data);
+        return Customer::create($data);
     }
 }

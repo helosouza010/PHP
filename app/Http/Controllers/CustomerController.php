@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    protected $customerService; 
+    protected $customerService;
+
     public function __construct(CustomerService $customerService)
     {
         $this->customerService = $customerService;
     }
-
 
     public function index()
     {
@@ -28,26 +28,29 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'cpf' => 'required|size:11',
             'email' => 'required|email',
-            'phone' => 'required',
-            'address' => 'required',
+            'phone' => 'required|string',
+            'address' => 'required|string',
         ], [
             'name.required' => 'O campo Nome é obrigatório.',
             'cpf.required' => 'O campo CPF é obrigatório.',
-            'email.required' => 'O campo Email é obrigatório.',            
+            'email.required' => 'O campo Email é obrigatório.',
             'phone.required' => 'O campo Telefone é obrigatório.',
             'address.required' => 'O campo Endereço é obrigatório.',
-        ]);  
-        Customer::create($request->all());
-        return redirect()->route('customers.index');
+        ]);
+
+        $this->customerService->storeCustomer($validated);
+
+        return redirect()->route('customers.index')
+            ->with('success', 'Cliente criado com sucesso.');
     }
 
-     public function show(string $id)
+    public function show(string $id)
     {
-        return 'O id do usuário é: ' . $id;
+        return 'O id do cliente é: ' . $id;
     }
 
     public function edit($id)
@@ -58,13 +61,27 @@ class CustomerController extends Controller
 
     public function update(Request $request, $id)
     {
-       Customer::find($id)->update($request->all());
-        return redirect()->route('customers.index');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'cpf' => 'required|size:11',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'address' => 'required|string',
+        ]);
+
+        $customer = Customer::findOrFail($id);
+        $customer->update($validated);
+
+        return redirect()->route('customers.index')
+            ->with('success', 'Cliente atualizado com sucesso.');
     }
 
     public function destroy($id)
     {
-      Customer::find($id)->delete();
-        return redirect()->route('customers.index');
+        $customer = Customer::findOrFail($id);
+        $customer->delete();
+
+        return redirect()->route('customers.index')
+            ->with('success', 'Cliente excluído com sucesso.');
     }
 }
